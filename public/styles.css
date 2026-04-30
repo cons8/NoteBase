@@ -185,6 +185,24 @@ body {
   min-height: 20px;
 }
 
+.keep-images-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.keep-images-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
 /* Main Content */
 .main-content {
   display: grid;
@@ -599,7 +617,13 @@ body {
   padding: 16px 24px;
   border-top: 1px solid var(--border);
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-footer-actions {
+  display: flex;
+  gap: 12px;
 }
 
 /* Loading skeleton */

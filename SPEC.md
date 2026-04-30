@@ -65,6 +65,11 @@
 - 边框: 1px solid #e2e8f0
 - 聚焦时边框变为主色 #2563eb
 
+**图片选项**:
+- 「保留图片」复选框，默认勾选
+- 位于输入框和抓取按钮之间
+- 不勾选则抓取时移除所有图片
+
 **抓取按钮**:
 - 背景: #2563eb
 - 文字: 白色
@@ -116,7 +121,9 @@
 **导出功能**:
 - 导出为 Markdown: 转换为标准 Markdown 格式
 - 导出为 HTML: 干净的 HTML 片段
-- 复制到剪贴板: 复制 Markdown 格式
+- 复制: 复制内容到剪贴板
+- 下载: 下载为 .md 或 .html 文件
+- HTML 导出可选「保留样式」，下载时包含基础 CSS 样式表
 
 ### 3.2 交互细节
 
@@ -164,7 +171,7 @@ NoteBase/
 ### 4.3 API 设计
 
 **POST /api/fetch**
-- 请求体: `{ url: string }`
+- 请求体: `{ url: string, keepImages?: boolean }` (keepImages 默认为 true)
 - 成功响应: `{ success: true, title: string, content: string, originalHtml: string }`
 - 失败响应: `{ success: false, error: string }`
 

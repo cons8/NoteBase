@@ -44,6 +44,10 @@
           placeholder="输入网址，如 https://example.com/article"
           autocomplete="off"
         >
+        <label class="keep-images-label">
+          <input type="checkbox" id="keepImages" checked>
+          <span>保留图片</span>
+        </label>
         <button id="fetchBtn" class="fetch-btn">
           <span class="btn-text">抓取内容</span>
           <svg class="btn-spinner" viewBox="0 0 24 24" fill="none">
@@ -171,13 +175,27 @@
           <pre id="exportCode"></pre>
         </div>
         <div class="modal-footer">
-          <button id="copyExportBtn" class="action-btn primary-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-            </svg>
-            复制到剪贴板
-          </button>
+          <label id="keepCssLabel" class="keep-images-label" style="display: none;">
+            <input type="checkbox" id="keepCss" checked>
+            <span>保留样式</span>
+          </label>
+          <div class="modal-footer-actions">
+            <button id="copyExportBtn" class="action-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              复制
+            </button>
+            <button id="downloadExportBtn" class="action-btn primary-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7,10 12,15 17,10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              下载
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -11,13 +11,15 @@
     history: [],
     historyIndex: -1,
     maxHistory: 50,
-    isLoading: false
+    isLoading: false,
+    currentExportFormat: 'markdown'
   };
 
   // DOM Elements
   const elements = {
     urlInput: document.getElementById('urlInput'),
     fetchBtn: document.getElementById('fetchBtn'),
+    keepImages: document.getElementById('keepImages'),
     urlError: document.getElementById('urlError'),
     originalContent: document.getElementById('originalContent'),
     cleanedContent: document.getElementById('cleanedContent'),
@@ -33,7 +35,10 @@
     modalTitle: document.getElementById('modalTitle'),
     exportCode: document.getElementById('exportCode'),
     closeModal: document.getElementById('closeModal'),
-    copyExportBtn: document.getElementById('copyExportBtn')
+    copyExportBtn: document.getElementById('copyExportBtn'),
+    downloadExportBtn: document.getElementById('downloadExportBtn'),
+    keepCssLabel: document.getElementById('keepCssLabel'),
+    keepCss: document.getElementById('keepCss')
   };
 
   // Turndown service for Markdown conversion
@@ -72,6 +77,7 @@
 
     elements.closeModal.addEventListener('click', closeModal);
     elements.copyExportBtn.addEventListener('click', copyModalContent);
+    elements.downloadExportBtn.addEventListener('click', downloadModalContent);
 
     elements.exportModal.addEventListener('click', (e) => {
       if (e.target === elements.exportModal) {
@@ -130,7 +136,7 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ url })
+        body: JSON.stringify({ url, keepImages: elements.keepImages.checked })
       });
 
       const data = await response.json();
@@ -376,11 +382,14 @@
         content = htmlToMarkdown(cleanedHtml.innerHTML);
       }
       title = '导出 Markdown';
+      elements.keepCssLabel.style.display = 'none';
     } else {
       content = cleanedHtml.innerHTML;
       title = '导出 HTML';
+      elements.keepCssLabel.style.display = 'flex';
     }
 
+    state.currentExportFormat = format;
     elements.modalTitle.textContent = title;
     elements.exportCode.textContent = content;
     elements.exportModal.classList.add('show');
@@ -483,6 +492,74 @@
     } catch (err) {
       showToast('复制失败', 'error');
     }
+  }
+
+  // Download modal content
+  function downloadModalContent() {
+    let content = elements.exportCode.textContent;
+    const title = elements.modalTitle.textContent;
+    const isMarkdown = title.includes('Markdown');
+    const ext = isMarkdown ? 'md' : 'html';
+    const mimeType = isMarkdown ? 'text/markdown' : 'text/html';
+    const filename = `notebase-export.${ext}`;
+
+    // Wrap HTML with basic CSS if keepCss is checked
+    if (!isMarkdown && elements.keepCss.checked) {
+      content = wrapHtmlWithCss(content);
+    }
+
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast('已开始下载', 'success');
+    closeModal();
+  }
+
+  // Wrap HTML content with basic CSS
+  function wrapHtmlWithCss(html) {
+    return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NoteBase Export</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.7;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      color: #1e293b;
+    }
+    h1, h2, h3, h4, h5, h6 { margin-top: 1.5em; margin-bottom: 0.5em; font-weight: 600; line-height: 1.3; }
+    h1 { font-size: 1.75rem; } h2 { font-size: 1.5rem; } h3 { font-size: 1.25rem; }
+    p { margin-bottom: 1em; }
+    img { max-width: 100%; height: auto; border-radius: 4px; margin: 1em 0; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul, ol { margin-bottom: 1em; padding-left: 1.5em; }
+    li { margin-bottom: 0.25em; }
+    blockquote { border-left: 3px solid #2563eb; padding-left: 1em; margin: 1em 0; color: #64748b; font-style: italic; }
+    pre { background: #1e293b; color: #e2e8f0; padding: 1em; border-radius: 6px; overflow-x: auto; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.875em; background: #f1f5f9; padding: 0.2em 0.4em; border-radius: 4px; }
+    pre code { background: transparent; padding: 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+    th, td { border: 1px solid #e2e8f0; padding: 0.5em 1em; text-align: left; }
+    th { background: #f8fafc; font-weight: 600; }
+  </style>
+</head>
+<body>
+${html}
+</body>
+</html>`;
   }
 
   // Close modal
