@@ -32,6 +32,8 @@ export function toggleEditMode() {
     saveHistory();
     tab.currentHtml = elements.contentArea.innerHTML;
     saveTabs();
+    // Re-render to restore selectable state
+    renderCurrentView();
   }
 }
 

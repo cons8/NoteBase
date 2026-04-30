@@ -51,25 +51,27 @@ export function assignIdsAndLineNumbers(container) {
   const selectableTags = ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'section', 'article', 'aside', 'ul', 'ol', 'li', 'table', 'blockquote', 'pre', 'figure', 'figcaption'];
   let lineNumber = 0;
 
-  function processElement(element, isTopLevel) {
+  function processElement(element) {
     const tagName = element.tagName.toLowerCase();
 
-    if (selectableTags.includes(tagName) && element.children.length > 0) {
+    if (selectableTags.includes(tagName)) {
       const textContent = element.textContent.trim();
       if (textContent.length > 0) {
-        if (isTopLevel) {
-          element.dataset.lineNumber = ++lineNumber;
-          element.dataset.selectId = ++state.selectIdCounter;
+        element.dataset.lineNumber = ++lineNumber;
+        element.dataset.selectId = ++state.selectIdCounter;
+
+        // Only add selectable class and click handler when NOT in edit mode
+        if (!state.editMode) {
           element.classList.add('selectable');
           element.addEventListener('click', handleElementClick);
         }
       }
     }
 
-    Array.from(element.children).forEach(child => processElement(child, false));
+    Array.from(element.children).forEach(child => processElement(child));
   }
 
-  Array.from(container.children).forEach(child => processElement(child, true));
+  processElement(container);
 }
 
 // Export for tabs.js
