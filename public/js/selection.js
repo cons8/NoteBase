@@ -15,10 +15,10 @@ export function toggleEditMode() {
   if (state.editMode) {
     const tab = getCurrentTab();
     tab.selectedIds = [];
-    document.querySelectorAll('.selectable.selected').forEach(el => {
+    document.querySelectorAll('.selectable').forEach(el => {
       el.classList.remove('selected');
+      el.classList.remove('selectable');
     });
-    // Enable edit on container
     elements.contentArea.contentEditable = 'true';
     elements.contentArea.classList.add('edit-mode');
     updateUI();

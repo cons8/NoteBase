@@ -43,6 +43,7 @@ export const elements = {
   keepImages: document.getElementById('keepImages'),
   urlError: document.getElementById('urlError'),
   contentArea: document.getElementById('contentArea'),
+  lineNumberColumn: document.getElementById('lineNumberColumn'),
   selectionCount: document.getElementById('selectionCount'),
   selectedCount: document.getElementById('selectedCount'),
   deleteSelectedBtn: document.getElementById('deleteSelectedBtn'),
