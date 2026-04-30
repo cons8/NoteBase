@@ -1,5 +1,5 @@
 // Content rendering
-import { state, elements, getCurrentTab, turndownService, selectIdCounter } from './state.js';
+import { state, elements, getCurrentTab, turndownService } from './state.js';
 import { handleElementClick } from './selection.js';
 
 // Get domain from URL (helper)
@@ -59,7 +59,7 @@ export function assignIdsAndLineNumbers(container) {
       if (textContent.length > 0) {
         if (isTopLevel) {
           element.dataset.lineNumber = ++lineNumber;
-          element.dataset.selectId = ++selectIdCounter;
+          element.dataset.selectId = ++state.selectIdCounter;
           element.classList.add('selectable');
           element.addEventListener('click', handleElementClick);
         }

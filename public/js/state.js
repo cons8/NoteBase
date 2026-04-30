@@ -32,7 +32,8 @@ export const state = {
   pendingCloseTabId: null,
   pendingContextTabId: null,
   isInitialized: false,
-  editMode: false
+  editMode: false,
+  selectIdCounter: 0
 };
 
 // DOM Elements
@@ -76,7 +77,6 @@ export const elements = {
 
 // Turndown service for Markdown conversion
 export let turndownService = null;
-export let selectIdCounter = 0;
 
 // Get current tab
 export function getCurrentTab() {
