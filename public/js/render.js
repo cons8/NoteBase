@@ -1,0 +1,112 @@
+// Content rendering
+import { state, elements, getCurrentTab, turndownService } from './state.js';
+import { handleElementClick } from './selection.js';
+
+// Get domain from URL (helper)
+function getDomainFromUrl(url) {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url;
+  }
+}
+
+// Render current view
+export function renderCurrentView() {
+  const tab = getCurrentTab();
+
+  if (tab.currentHtml.length === 0) {
+    elements.contentArea.innerHTML = `
+      <div class="empty-state">
+        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7,10 12,15 17,10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <p>输入网址开始抓取内容</p>
+      </div>
+    `;
+    updateLineNumbers([]);
+    return;
+  }
+
+  renderHtmlView();
+}
+
+// Render HTML view (editable)
+export function renderHtmlView() {
+  const tab = getCurrentTab();
+  const container = document.createElement('div');
+  container.className = 'editable-content';
+
+  container.innerHTML = tab.currentHtml;
+  const selectableElements = assignIdsAndLineNumbers(container);
+  tab.currentHtml = container.innerHTML; // Persist IDs
+
+  elements.contentArea.innerHTML = '';
+  elements.contentArea.appendChild(container);
+
+  // Update line number column
+  updateLineNumbers(selectableElements);
+
+  // Sync scroll between content and line numbers
+  syncLineNumberScroll();
+}
+
+// Update line number column
+function updateLineNumbers(selectableElements) {
+  if (!elements.lineNumberColumn) return;
+
+  elements.lineNumberColumn.innerHTML = selectableElements.map((_, index) =>
+    `<div class="line-number-item">${index + 1}</div>`
+  ).join('');
+}
+
+// Sync scroll position between content area and line number column
+function syncLineNumberScroll() {
+  const contentArea = elements.contentArea;
+  const lineNumberColumn = elements.lineNumberColumn;
+
+  if (!contentArea || !lineNumberColumn) return;
+
+  const syncScroll = () => {
+    lineNumberColumn.scrollTop = contentArea.scrollTop;
+  };
+
+  contentArea.addEventListener('scroll', syncScroll, { passive: true });
+}
+
+// Assign IDs to selectable elements
+export function assignIdsAndLineNumbers(container) {
+  const selectableTags = ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'section', 'article', 'aside', 'ul', 'ol', 'li', 'table', 'blockquote', 'pre', 'figure', 'figcaption'];
+
+  // Collect all selectable elements first
+  const selectableElements = [];
+  function collectElements(element) {
+    const tagName = element.tagName.toLowerCase();
+    if (selectableTags.includes(tagName)) {
+      const textContent = element.textContent.trim();
+      if (textContent.length > 0) {
+        selectableElements.push(element);
+      }
+    }
+    Array.from(element.children).forEach(child => collectElements(child));
+  }
+  collectElements(container);
+
+  // Assign select IDs
+  selectableElements.forEach((el) => {
+    el.dataset.selectId = ++state.selectIdCounter;
+
+    // Only add selectable class and click handler when NOT in edit mode
+    if (!state.editMode) {
+      el.classList.add('selectable');
+      el.addEventListener('click', handleElementClick);
+    }
+  });
+
+  return selectableElements;
+}
+
+// Export for tabs.js
+export { getDomainFromUrl };

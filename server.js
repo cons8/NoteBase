@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/fetch', async (req, res) => {
-  const { url } = req.body;
+  const { url, keepImages = true } = req.body;
 
   if (!url) {
     return res.status(400).json({ success: false, error: 'URL is required' });
@@ -74,7 +74,7 @@ app.post('/api/fetch', async (req, res) => {
     }
 
     // Clean up the HTML
-    const cleanedHtml = cleanHtml(mainContent);
+    const cleanedHtml = cleanHtml(mainContent, keepImages);
 
     res.json({
       success: true,
@@ -107,7 +107,7 @@ app.post('/api/fetch', async (req, res) => {
   }
 });
 
-function cleanHtml(html) {
+function cleanHtml(html, keepImages = true) {
   // Remove comments
   html = html.replace(/<!--[\s\S]*?-->/g, '');
 
@@ -120,6 +120,11 @@ function cleanHtml(html) {
   // Remove inline event handlers
   html = html.replace(/\s*on\w+="[^"]*"/gi, '');
   html = html.replace(/\s*on\w+='[^']*'/gi, '');
+
+  // Remove images if keepImages is false
+  if (!keepImages) {
+    html = html.replace(/<img[^>]*>/gi, '');
+  }
 
   // Remove class attributes (keep data attributes for selection)
   // But we want to keep some structural classes
